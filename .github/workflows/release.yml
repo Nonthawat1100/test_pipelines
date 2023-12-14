@@ -1,5 +1,15 @@
 name: "Release"
 
+on:
+  push:
+    tags:
+      - "v*.*.*" # Match tags that start with 'v'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag for automatic release
+        required: true
+
 changelog:
   exclude:
     authors:
@@ -13,6 +23,3 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-    # Waiting for the job bump_files_version to finish.
-    # After completion, the relase job is started. 
-    needs: bump_files_version
