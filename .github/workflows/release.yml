@@ -1,24 +1,36 @@
-name: "Release"
+name: Generate Release Notes
 
 on:
   push:
-    tags:
-      - "v*.*.*" # Match tags that start with 'v'
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: Tag for automatic release
-        required: true
+    branches:
+      - main
 
 jobs:
-  changelog:
-    exclude:
-      authors:
-        - ludovico-bot
-  release:
+  generate-release-notes:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Generate Release Notes
+        run: |
+          VERSION="v1.0.0"
+          EXCLUDED_AUTHORS="afraijat"
+          PREVIOUS_VERSION=$(git describe --tags --abbrev=0)
+
+          git log --pretty=format:"%h - %s (%an)" $PREVIOUS_VERSION..HEAD | grep -v "$EXCLUDED_AUTHORS" > release_notes.txt
+
+          git add release_notes.txt
+          git commit -m "Update release notes"
+          git push
+
+      - name: Create GitHub Release
+        run: gh release create $VERSION -F release_notes.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
