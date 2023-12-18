@@ -10,12 +10,11 @@ on:
         description: Tag for automatic release
         required: true
 
-changelog:
-  exclude:
-    authors:
-      - ludovico-bot
-
 jobs:
+  changelog:
+    exclude:
+      authors:
+        - ludovico-bot
   release:
     runs-on: ubuntu-latest
     steps:
