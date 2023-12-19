@@ -8,29 +8,17 @@ on:
 jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
-
+    changelog:
+        exclude:
+          labels:
+            - afraijat
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Git
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-
       - name: Generate Release Notes
-        run: |
-          VERSION="v1.0.0"
-          EXCLUDED_AUTHORS="afraijat"
-          PREVIOUS_VERSION=$(git describe --tags --abbrev=0)
+        id: release-notes
+        uses: github/docs@main # This should point to the version you want to use
 
-          git log --pretty=format:"%h - %s (%an)" $PREVIOUS_VERSION..HEAD | grep -v "$EXCLUDED_AUTHORS" > release_notes.txt
-
-          git add release_notes.txt
-          git commit -m "Update release notes"
-          git push
-
-      - name: Create GitHub Release
-        run: gh release create $VERSION -F release_notes.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Display Release Notes
+        run: echo "${{ steps.release-notes.outputs.release-notes }}"
