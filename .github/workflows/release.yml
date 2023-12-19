@@ -15,8 +15,6 @@ jobs:
       - name: Generate Release Notes
         id: release-notes
         uses: github/docs@main # This should point to the version you want to use
-        with:
-          changelog.exclude.authors: "afraijat"
 
       - name: Display Release Notes
         run: echo "${{ steps.release-notes.outputs.release-notes }}"
