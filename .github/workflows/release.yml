@@ -14,7 +14,7 @@ jobs:
 
       - name: Generate Release Notes
         id: release-notes
-        uses: github/docs@preview-env-27102
+        uses: github/docs@v1.0.1
         # This should point to the version you want to use
 
       - name: Display Release Notes
