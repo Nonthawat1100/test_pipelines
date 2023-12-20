@@ -12,10 +12,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
       - name: Generate Release Notes
         id: release-notes
-        uses: github/docs@repo-sync
-        # This should point to the version you want to use
+        uses: github/github-release-notes-action@v1
+        with:
+          output-file: release-notes.md
 
       - name: Display Release Notes
-        run: echo "${{ steps.release-notes.outputs.release-notes }}"
+        run: cat release-notes.md
