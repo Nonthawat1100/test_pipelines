@@ -31,7 +31,8 @@ jobs:
           conventional-changelog -p angular -i CHANGELOG.md -s -r 0 -t "${latestTag}" -v "${currentTag}"
 
           # Exclude certain users from release notes
-          sed -i 'afraijat' CHANGELOG.md
+          sed -i '/<exclude-user-1>/d' CHANGELOG.md
+          sed -i '/<exclude-user-2>/d' CHANGELOG.md
 
           # Commit the updated release notes
           git add CHANGELOG.md
@@ -40,8 +41,4 @@ jobs:
           git commit -m "chore: update release notes [skip ci]"
 
       - name: Push changes
-        uses: ad-m/github-push-action@v0.8.0
-        with:
-          branch: ${{ github.head_ref }}
-          force: true
-          tags: ${{ github.ref }}
+        run: git push origin HEAD:${{ github.ref }}
