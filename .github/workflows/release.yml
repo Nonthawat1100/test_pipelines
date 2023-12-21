@@ -1,30 +1,47 @@
 name: Generate Release Notes
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types:
+      - created
 
 jobs:
   generate-release-notes:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: '14'
 
       - name: Install dependencies
-        run: npm install
+        run: npm install -g conventional-changelog-cli
 
       - name: Generate Release Notes
-        id: release-notes
-        uses: github/github-release-notes-action@v1
-        with:
-          output-file: release-notes.md
+        run: |
+          # Get the latest tag and the current tag
+          latestTag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          currentTag=$(git describe --tags)
 
-      - name: Display Release Notes
-        run: cat release-notes.md
+          # Generate release notes
+          conventional-changelog -p angular -i CHANGELOG.md -s -r 0 -t "${latestTag}" -v "${currentTag}"
+
+          # Exclude certain users from release notes
+          sed -i 'afraijat' CHANGELOG.md
+
+          # Commit the updated release notes
+          git add CHANGELOG.md
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -m "chore: update release notes [skip ci]"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          branch: ${{ github.head_ref }}
+          force: true
+          tags: ${{ github.ref }}
