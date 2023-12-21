@@ -1,9 +1,9 @@
 name: Generate Release Notes
 
 on:
-  release:
-    types:
-      - created
+  push:
+    branches:
+      - main
 
 jobs:
   generate-release-notes:
