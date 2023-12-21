@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: npm install -g conventional-changelog-cli
 
+      - name: Fetch tags
+        run: git fetch --tags
+
       - name: Generate Release Notes
         run: |
           # Get the latest tag and the current tag
