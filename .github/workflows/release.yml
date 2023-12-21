@@ -27,8 +27,18 @@ jobs:
       - name: Generate Release Notes
         run: |
           # Get the latest tag and the current tag
-          latestTag=$(git describe --tags $(git rev-list --tags --max-count=1))
+          latestTag=$(git for-each-ref --sort=-taggerdate --format '%(refname:short)' refs/tags | head -n 1)
           currentTag=$(git describe --tags)
+          echo "Latest Tag: $latestTag"
+          echo "Current Tag: $currentTag"
+          if [ -z "$latestTag" ]; then
+            echo "No previous tags found."
+            exit 1
+          fi
+          if [ -z "$currentTag" ]; then
+            echo "No current tags found."
+            exit 1
+          fi
 
           # Generate release notes
           conventional-changelog -p angular -i CHANGELOG.md -s -r 0 -t "${latestTag}" -v "${currentTag}"
